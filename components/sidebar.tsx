@@ -121,7 +121,6 @@ export default function Sidebar() {
           </li>
 
           {/* ... (Otros enlaces comunes) */}
-          {userRole === 'worker' && (
           <li>
             <Link
               href="/settings"
@@ -131,7 +130,7 @@ export default function Sidebar() {
               <Settings className="h-5 w-5 mr-3" />
               Ajustes
             </Link>
-          </li>)}
+          </li>
           <li>
             <Link
               href="/about"
