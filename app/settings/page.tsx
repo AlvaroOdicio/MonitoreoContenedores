@@ -127,7 +127,7 @@ export default function SettingsPage() {
         <main className="flex-1 overflow-y-auto p-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-            {/* Información del usuario (AHORA CON DATOS REALES) */}
+            {/* Columna 1: Información del usuario (AHORA CON DATOS REALES) */}
             <Card className="shadow-sm">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold">Información del Usuario</CardTitle>
@@ -210,122 +210,132 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
 
-            {/* Documentos y configuración */}
+            {/* Columna 2: Documentos y configuración */}
+            {/* Este div 'space-y-6' ahora es público */}
             <div className="space-y-6">
+
+              {/* AQUÍ COMIENZA LA VALIDACIÓN: Solo para 'worker' */}
+              {userRole === 'worker' && (
+                <> {/* Usamos un fragmento para agrupar las tarjetas solo para workers */}
+                  <Card className="shadow-sm">
+                    <CardHeader>
+                      <CardTitle className="text-lg font-semibold">Documentos de Recolección</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                          <div className="flex items-center">
+                            <FileText className="h-5 w-5 text-gray-500 mr-3" />
+                            <span>Reporte_Mayo_2023.pdf</span>
+                          </div>
+                          <Button variant="outline" size="sm">
+                            Ver
+                          </Button>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                          <div className="flex items-center">
+                            <FileText className="h-5 w-5 text-gray-500 mr-3" />
+                            <span>Reporte_Junio_2023.pdf</span>
+                          </div>
+                          <Button variant="outline" size="sm">
+                            Ver
+                          </Button>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                          <div className="flex items-center">
+                            <FileText className="h-5 w-5 text-gray-500 mr-3" />
+                            <span>Reporte_Julio_2023.pdf</span>
+                          </div>
+                          <Button variant="outline" size="sm">
+                            Ver
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="shadow-sm">
+                    <CardHeader>
+                      <CardTitle className="text-lg font-semibold">Documentos de Identificación</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                          <div className="flex items-center">
+                            <FileText className="h-5 w-5 text-gray-500 mr-3" />
+                            <span>DNI</span>
+                          </div>
+                          <Button variant="outline" size="sm">
+                            Editar
+                          </Button>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                          <div className="flex items-center">
+                            <FileText className="h-5 w-5 text-gray-500 mr-3" />
+                            <span>Licencia de conducir</span>
+                          </div>
+                          <Button variant="outline" size="sm">
+                            Editar
+                          </Button>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                          <div className="flex items-center">
+                            <FileText className="h-5 w-5 text-gray-500 mr-3" />
+                            <span>Certificado de residencia</span>
+                          </div>
+                          <Button variant="outline" size="sm">
+                            Editar
+                          </Button>
+                        </div>
+
+                        <div className="pt-2">
+                          <Button className="w-full bg-gray-700 hover:bg-gray-800">
+                            <Upload className="h-4 w-4 mr-2" />
+                            Subir nuevo documento
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
+              {/* AQUÍ TERMINA LA VALIDACIÓN */}
+
+
+              {/* --- SECCIÓN PARA TODOS --- */}
+              {/* Esta tarjeta está fuera de la validación 'worker' y siempre se mostrará */}
               <Card className="shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-lg font-semibold">Documentos de Recolección</CardTitle>
+                  <CardTitle className="text-lg font-semibold">Preferencias</CardTitle>
                 </CardHeader>
                 <CardContent>
+                  {/* ... (Contenido de Preferencias) ... */}
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                      <div className="flex items-center">
-                        <FileText className="h-5 w-5 text-gray-500 mr-3" />
-                        <span>Reporte_Mayo_2023.pdf</span>
-                      </div>
-                      <Button variant="outline" size="sm">
-                        Ver
-                      </Button>
+                    <div>
+                      <label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-1">
+                        Idioma de la aplicación
+                      </label>
+                      <Select defaultValue="es">
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Seleccionar idioma" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="es">Español</SelectItem>
+                          <SelectItem value="en">English</SelectItem>
+                          <SelectItem value="pt">Português</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                      <div className="flex items-center">
-                        <FileText className="h-5 w-5 text-gray-500 mr-3" />
-                        <span>Reporte_Junio_2023.pdf</span>
-                      </div>
-                      <Button variant="outline" size="sm">
-                        Ver
-                      </Button>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                      <div className="flex items-center">
-                        <FileText className="h-5 w-5 text-gray-500 mr-3" />
-                        <span>Reporte_Julio_2023.pdf</span>
-                      </div>
-                      <Button variant="outline" size="sm">
-                        Ver
-                      </Button>
+                    {/* ... (Otras preferencias) ... */}
+                    <div className="pt-4">
+                      <Button className="bg-green-600 hover:bg-green-700">Guardar preferencias</Button>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-
-                          <Card className="shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold">Documentos de Identificación</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                      <div className="flex items-center">
-                        <FileText className="h-5 w-5 text-gray-500 mr-3" />
-                        <span>DNI</span>
-                      </div>
-                      <Button variant="outline" size="sm">
-                        Editar
-                      </Button>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                      <div className="flex items-center">
-                        <FileText className="h-5 w-5 text-gray-500 mr-3" />
-                        <span>Licencia de conducir</span>
-                      </div>
-                      <Button variant="outline" size="sm">
-                        Editar
-                      </Button>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                      <div className="flex items-center">
-                        <FileText className="h-5 w-5 text-gray-500 mr-3" />
-                        <span>Certificado de residencia</span>
-                      </div>
-                      <Button variant="outline" size="sm">
-                        Editar
-                      </Button>
-                    </div>
-
-                    <div className="pt-2">
-                      <Button className="w-full bg-gray-700 hover:bg-gray-800">
-                        <Upload className="h-4 w-4 mr-2" />
-                        Subir nuevo documento
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-            {/* --- SECCIÓN PARA TODOS --- */}
-            <Card className="shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">Preferencias</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {/* ... (Contenido de Preferencias) ... */}
-                <div className="space-y-4">
-                  <div>
-                    <label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-1">
-                      Idioma de la aplicación
-                    </label>
-                    <Select defaultValue="es">
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Seleccionar idioma" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="es">Español</SelectItem>
-                        <SelectItem value="en">English</SelectItem>
-                        <SelectItem value="pt">Português</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {/* ... (Otras preferencias) ... */}
-                  <div className="pt-4">
-                    <Button className="bg-green-600 hover:bg-green-700">Guardar preferencias</Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            </div> {/* Fin del div 'space-y-6' */}
           </div>
-      </div>
-    </main>
+        </main>
       </div >
     </div >
   )
