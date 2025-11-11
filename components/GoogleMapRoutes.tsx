@@ -25,9 +25,13 @@ interface LatLng {
   lng: number
 }
 
+// OBSERVACIÓN: He añadido 'name' como opcional.
+// Lo usas en el panel lateral (matched?.name).
+// Si tus contenedores siempre tienen nombre, quita el '?'.
 interface Container {
   id: string
   location: LatLng
+  name?: string
 }
 
 interface MapComponentProps {
@@ -36,6 +40,7 @@ interface MapComponentProps {
   route?: LatLng[]
 }
 
+// Este es el componente que está en 'components/GoogleMapRoutes.tsx'
 export default function MapComponent({
   containers,
   selectedContainer,
@@ -46,7 +51,9 @@ export default function MapComponent({
     libraries: GOOGLE_MAP_LIBRARIES,
   })
 
-  const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null)
+  const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(
+    null
+  )
   const mapRef = useRef<google.maps.Map | null>(null)
 
   const onLoad = (map: google.maps.Map) => {
@@ -54,8 +61,8 @@ export default function MapComponent({
   }
 
   useEffect(() => {
-    console.log("API Key:", process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)
-    console.log("Containers:", containers)
+    console.log('API Key:', process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)
+    console.log('Containers:', containers)
     if (
       selectedContainer &&
       mapRef.current &&
@@ -67,11 +74,12 @@ export default function MapComponent({
   }, [selectedContainer])
 
   useEffect(() => {
+    // Es buena práctica chequear 'isLoaded' aquí también
     if (!isLoaded || typeof window === 'undefined' || !window.google || route.length < 2) {
       setDirections(null)
       return
     }
-  
+
     const cleanedRoute = route
       .map((point) => ({
         lat: Number(point.lat),
@@ -84,9 +92,15 @@ export default function MapComponent({
           !isNaN(p.lat) &&
           !isNaN(p.lng)
       )
-  
+    
+    // Evita errores si cleanedRoute queda vacío después de filtrar
+    if (cleanedRoute.length < 1) {
+        setDirections(null)
+        return
+    }
+
     const directionsService = new window.google.maps.DirectionsService()
-  
+
     directionsService.route(
       {
         origin: centerDefault,
@@ -106,11 +120,23 @@ export default function MapComponent({
       }
     )
   }, [isLoaded, route])
-  
-  
-  
 
+  
+  // --- ⬇️ CORRECCIÓN PRINCIPAL AQUÍ ⬇️ ---
+  //
+  // Si la API de Google Maps (isLoaded) aún no está lista,
+  // mostramos un mensaje de carga.
+  // Esto evita que <GoogleMap> intente renderizarse y falle
+  // porque el objeto 'google' no está definido.
+  if (!isLoaded) {
+    return (
+      <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+        <p>Cargando mapa...</p>
+      </div>
+    )
+  }
 
+  // Si isLoaded es true, el resto del componente se renderiza:
   return (
     <div style={{ display: 'flex', height: '100%' }}>
       <div style={{ flex: 1, position: 'relative' }}>
@@ -120,6 +146,7 @@ export default function MapComponent({
           zoom={14}
           onLoad={onLoad}
         >
+          {/* --- Marcadores y rutas --- */}
           <Marker
             position={centerDefault}
             icon={{ url: 'http://maps.google.com/mapfiles/ms/icons/truck.png' }}
@@ -168,26 +195,27 @@ export default function MapComponent({
         >
           <h3 style={{ marginBottom: '0.5rem' }}>Orden de visita</h3>
           <ol style={{ paddingLeft: '1.2rem' }}>
-      {route.map((point, index) => {
-        const matched = containers.find(
-          (c) =>
-            Number(c.location.lat).toFixed(5) === Number(point.lat).toFixed(5) &&
-            Number(c.location.lng).toFixed(5) === Number(point.lng).toFixed(5)
-        )
+            {route.map((point, index) => {
+              const matched = containers.find(
+                (c) =>
+                  Number(c.location.lat).toFixed(5) ===
+                    Number(point.lat).toFixed(5) &&
+                  Number(c.location.lng).toFixed(5) ===
+                    Number(point.lng).toFixed(5)
+              )
 
-        return (
-          <li key={index}>
-            <strong>{matched?.name || `Punto ${index + 1}`}</strong>
-            <br />
-            <small>
-              Lat: {point.lat.toFixed(5)} <br />
-              Lng: {point.lng.toFixed(5)}
-            </small>
-          </li>
-        )
-      })}
-    </ol>
-
+              return (
+                <li key={index}>
+                  <strong>{matched?.name || `Punto ${index + 1}`}</strong>
+                  <br />
+                  <small>
+                    Lat: {point.lat.toFixed(5)} <br />
+                    Lng: {point.lng.toFixed(5)}
+                  </small>
+                </li>
+              )
+            })}
+          </ol>
         </div>
       )}
     </div>
