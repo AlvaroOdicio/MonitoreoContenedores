@@ -120,14 +120,6 @@ export default function MapComponent({
       }
     )
   }, [isLoaded, route])
-
-  
-  // --- ⬇️ CORRECCIÓN PRINCIPAL AQUÍ ⬇️ ---
-  //
-  // Si la API de Google Maps (isLoaded) aún no está lista,
-  // mostramos un mensaje de carga.
-  // Esto evita que <GoogleMap> intente renderizarse y falle
-  // porque el objeto 'google' no está definido.
   if (!isLoaded) {
     return (
       <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
@@ -210,7 +202,7 @@ export default function MapComponent({
                   <br />
                   <small>
                     Lat: {point.lat.toFixed(5)} <br />
-                    Lng: {point.lng.toFixed(5)}
+                    Lng: {point.lng.toFixed(5)} <br />
                   </small>
                 </li>
               )
