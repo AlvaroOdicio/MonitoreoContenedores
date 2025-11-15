@@ -159,7 +159,6 @@ export default function MapComponent({
                 key={c.id}
                 position={{ lat, lng }}
                 title={c.id}
-                label={(index + 1).toString()}
               />
             )
           })}
