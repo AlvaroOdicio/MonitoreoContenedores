@@ -19,12 +19,12 @@ import {
   getMalfunctionReports,
   resolveMalfunctionReport,
   ReportResponse
-} from "@/app/services/containers/reportService" // 馃憟 Corregido el path
+} from "@/app/services/containers/reportService" // Corregido el path
 import {
   getAllContainers,
   Container,
   getAddressFromLatLng
-} from "@/app/services/containers/containersManagement" // 馃憟 Corregido el path
+} from "@/app/services/containers/containersManagement" // Corregido el path
 
 // --- Define tus umbrales ---
 const UMBRAL_CRITICO = 90; // (90% o m谩s) Alerta Roja
@@ -165,7 +165,7 @@ export default function Home() {
       <div className="flex h-screen bg-gray-100">
         <Sidebar />
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-gray-600">Cargando m茅tricas...</p>
+          <p className="text-gray-600">Cargando métricas...</p>
         </div>
       </div>
     );
@@ -275,7 +275,7 @@ export default function Home() {
             </Card>
           </div>
 
-          {/* --- 馃憞 [NUEVA SECCI脫N] ALERTAS CIUDADANOS --- */}
+          {/* --- 馃憞 [NUEVA SECCIÓN] ALERTAS CIUDADANOS --- */}
           <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 mt-6">
             <Card>
               <CardHeader>
