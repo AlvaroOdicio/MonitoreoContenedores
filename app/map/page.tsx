@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -10,7 +9,7 @@ import MapComponent from "@/components/GoogleMapRoutes"
 import { SimulationResult } from "@/components/GoogleMapRoutes"
 import ScheduleCollectionModal from "@/components/schedule-collection-modal"
 import { getAllContainers } from "@/app/services/containers/containersManagement"
-
+import LastRouteFooter from "@/components/LastRouteFooter"
 interface Container {
   id: string
   name: string
@@ -31,6 +30,17 @@ interface RouteType {
   status: "active" | "completed" | "planned"
 }
 
+interface Simulation {
+  id: number
+  created_at: string
+  total_distance_km: number
+  duration_min: number
+  route: string[]
+  distances: string
+}
+
+type UserRole = 'citizen' | 'worker' | null;
+
 export default function MapPage() {
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState("")
@@ -43,6 +53,19 @@ export default function MapPage() {
   const [routeCoordinates, setRouteCoordinates] = useState<{ lat: number; lng: number }[]>([])
   const [loadingRoute, setLoadingRoute] = useState(false)
   const [simulationData1, setSimulationData] = useState<SimulationResult | null>(null)
+  const [userRole, setUserRole] = useState<UserRole>(null);
+  const [allSimulations, setAllSimulations] = useState<Simulation[]>([])
+
+  useEffect(() => {
+    try {
+      const storedRole = localStorage.getItem('role');
+      if (storedRole) {
+        setUserRole(JSON.parse(storedRole).toLowerCase() as UserRole);
+      }
+    } catch (error) {
+      console.error("Error al leer el rol de localStorage:", error);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchContainers = async () => {
@@ -64,13 +87,34 @@ export default function MapPage() {
           setContainers(transformed)
           setGuids(transformed.map(container => container.id))
         }
-        
+
       } catch (error) {
         console.error("Error al cargar contenedores:", error)
       }
     }
     fetchContainers()
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    const fetchSimulations = async () => {
+      try {
+        const response = await fetch('https://backend-api-monitoreo.onrender.com/api/v1/simulation/get-all-simulations')
+        
+        if (response.ok) {
+          const data = await response.json()
+          // Opcional: Ordenar por fecha descendente si la API no lo garantiza
+          // data.sort((a: Simulation, b: Simulation) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+          setAllSimulations(data)
+        } else {
+          console.error('Error al obtener simulaciones:', response.statusText)
+        }
+      } catch (error) {
+        console.error('Error de red al cargar simulaciones:', error)
+      }
+    }
+
+    fetchSimulations()
+  }, []);
 
   const handleRouteGenerated = (response: SimulationResult) => {
     setSimulationData(response)
@@ -104,7 +148,7 @@ export default function MapPage() {
       })
       .filter((coord) => coord !== null) as { lat: number; lng: number }[]
   }
-  
+
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -126,11 +170,13 @@ export default function MapPage() {
             <Button variant="outline" size="icon">
               <Filter className="h-4 w-4" />
             </Button>
-            <div className="w-full flex items-center justify-end">
-                  <Button className="w-100 bg-green-600 hover:bg-green-700" onClick={handleScheduleCollection}>
-                    Programar recolección
-                  </Button>
-                </div>
+            {userRole === 'worker' && (
+              <div className="w-full flex items-center justify-end">
+                <Button className="w-100 bg-green-600 hover:bg-green-700" onClick={handleScheduleCollection}>
+                  Programar recolección
+                </Button>
+              </div>
+            )}
           </div>
 
         </header>
@@ -142,11 +188,10 @@ export default function MapPage() {
                 {filteredContainers.map((container) => (
                   <div
                     key={container.id}
-                    className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                      selectedContainer?.id === container.id
-                        ? "border-green-500 shadow-md"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
+                    className={`p-4 border rounded-lg cursor-pointer transition-all ${selectedContainer?.id === container.id
+                      ? "border-green-500 shadow-md"
+                      : "border-gray-200 hover:border-gray-300"
+                      }`}
                     onClick={() => setSelectedContainer(container)}
                   >
                     <h3 className="font-medium">{container.id}</h3>
@@ -154,13 +199,12 @@ export default function MapPage() {
                     <div className="flex items-center mt-2">
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
-                          className={`h-2 rounded-full ${
-                            container.fillLevel >= container.limit
-                              ? "bg-red-600"
-                              : container.fillLevel >= container.limit * 0.75
+                          className={`h-2 rounded-full ${container.fillLevel >= container.limit
+                            ? "bg-red-600"
+                            : container.fillLevel >= container.limit * 0.75
                               ? "bg-yellow-500"
                               : "bg-green-600"
-                          }`}
+                            }`}
                           style={{ width: `${container.fillLevel}%` }}
                         ></div>
                       </div>
@@ -176,7 +220,7 @@ export default function MapPage() {
           </div>
 
           <div className="flex-1 relative">
-          <MapComponent
+            <MapComponent
               containers={containers}
               selectedContainer={selectedContainer}
               route={routeCoordinates}
@@ -202,13 +246,12 @@ export default function MapPage() {
                   <h4 className="text-sm text-gray-500">Nivel de llenado</h4>
                   <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
                     <div
-                      className={`h-2.5 rounded-full ${
-                        selectedContainer.fillLevel >= selectedContainer.limit
-                          ? "bg-red-600"
-                          : selectedContainer.fillLevel >= selectedContainer.limit * 0.75
+                      className={`h-2.5 rounded-full ${selectedContainer.fillLevel >= selectedContainer.limit
+                        ? "bg-red-600"
+                        : selectedContainer.fillLevel >= selectedContainer.limit * 0.75
                           ? "bg-yellow-500"
                           : "bg-green-600"
-                      }`}
+                        }`}
                       style={{ width: `${selectedContainer.fillLevel}%` }}
                     ></div>
                   </div>
@@ -226,11 +269,15 @@ export default function MapPage() {
                     {Number(selectedContainer.location.lng).toFixed(6)}
                   </p>
                 </div>
-                
+
               </div>
             </div>
           )}
         </div>
+
+        <footer className="bg-white shadow-sm py-4 px-6">     
+          <LastRouteFooter allSimulations={allSimulations} />     
+        </footer>
 
         {(
           <ScheduleCollectionModal
