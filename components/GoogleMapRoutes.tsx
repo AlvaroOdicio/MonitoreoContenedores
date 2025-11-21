@@ -16,8 +16,8 @@ const containerStyle = {
 }
 
 const centerDefault = {
-  lat: -12.068572,
-  lng: -77.043147,
+  lat: -11.962418,
+  lng: -77.005315,
 }
 
 interface LatLng {
